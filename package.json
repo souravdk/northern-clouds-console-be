@@ -4,8 +4,8 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "start": "npm run seed && node server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
