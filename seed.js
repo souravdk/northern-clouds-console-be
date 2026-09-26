@@ -2,6 +2,17 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const pool = require('./db');
 
+async function testDatabase() {
+  try {
+    const [rows] = await pool.query('SELECT 1 AS connected');
+    console.log('Database connected:', rows);
+  } catch (error) {
+    console.error('Database connection failed:', error.message);
+  }
+}
+
+testDatabase();
+
 (async () => {
   try {
     const email = 'admin@example.com';
