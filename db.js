@@ -12,4 +12,15 @@ const pool = mysql.createPool({
   dateStrings: true,
 });
 
+async function testDatabase() {
+  try {
+    const [result] = await pool.query('SELECT 1 AS connected');
+    console.log('Database connected:', result);
+  } catch (error) {
+    console.error('Database connection failed:', error.message);
+  }
+}
+
+testDatabase();
+
 module.exports = pool;
