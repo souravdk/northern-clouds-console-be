@@ -25,5 +25,5 @@ app.use((err, _req, res, _next) => {
   res.status(err.status || 500).json({ error: err.message || 'Server error' });
 });
 
-const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`API listening on http://localhost:${port}`));
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`API listening on PORT: ${port}`));
