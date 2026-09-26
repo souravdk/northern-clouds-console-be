@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const pool = require('./db');
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
@@ -27,6 +28,19 @@ app.use((err, _req, res, _next) => {
 
 const port = Number(process.env.PORT || 3000);
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`API listening on port ${port}`);
-});
+async function startServer() {
+  try {
+    await pool.query('SELECT 1 AS connected');
+
+    console.log('Database connection successful');
+
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`API listening on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Database connection failed:', error.message);
+    process.exit(1);
+  }
+}
+
+startServer();
