@@ -9,7 +9,22 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json({ limit: '5mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/health', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({
+      ok: true,
+      database: 'connected',
+    });
+  } catch (error) {
+    console.error('Database health check failed:', error.message);
+    res.status(503).json({
+      ok: false,
+      database: 'disconnected',
+      error: error.message,
+    });
+  }
+});
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
