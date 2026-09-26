@@ -25,5 +25,8 @@ app.use((err, _req, res, _next) => {
   res.status(err.status || 500).json({ error: err.message || 'Server error' });
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`API listening on PORT: ${port}`));
+const port = Number(process.env.PORT || 3000);
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`API listening on port ${port}`);
+});
