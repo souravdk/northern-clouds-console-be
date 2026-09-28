@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const pool = require('./db');
+const runSeed = require('./seed');
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
@@ -23,6 +24,26 @@ app.get('/api/health', async (_req, res) => {
       database: 'disconnected',
       error: error.message,
     });
+  }
+});
+
+app.post('/api/seed', async (req, res) => {
+  const seedSecret = process.env.SEED_SECRET;
+
+  if (!seedSecret) {
+    return res.status(503).json({ error: 'Seed endpoint is not configured' });
+  }
+
+  if (req.get('x-seed-secret') !== seedSecret) {
+    return res.status(401).json({ error: 'Invalid seed secret' });
+  }
+
+  try {
+    const result = await runSeed();
+    res.json({ ok: true, message: 'Seed completed', result });
+  } catch (error) {
+    console.error('Seed failed:', error);
+    res.status(500).json({ ok: false, error: 'Seed failed' });
   }
 });
 

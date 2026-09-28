@@ -2,22 +2,11 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const pool = require('./db');
 
-async function testDatabase() {
-  try {
-    const [rows] = await pool.query('SELECT 1 AS connected');
-    console.log('Database connected:', rows);
-  } catch (error) {
-    console.error('Database connection failed:', error.message);
-  }
-}
-
-testDatabase();
-
-(async () => {
-  try {
+async function runSeed() {
     const email = 'admin@example.com';
     const password = 'admin123';
     const hash = await bcrypt.hash(password, 10);
+    let adminCreated = false;
 
     const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length) {
@@ -27,6 +16,7 @@ testDatabase();
         'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
         ['Owner', email, hash, 'owner']
       );
+      adminCreated = true;
       console.log(`Seeded admin: ${email} / ${password}`);
     }
 
@@ -43,9 +33,17 @@ testDatabase();
       );
     }
     console.log('Done.');
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
-})();
+
+    return { adminCreated, email, contentBlocksProcessed: blocks.length };
+}
+
+module.exports = runSeed;
+
+if (require.main === module) {
+  runSeed()
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error(error);
+      process.exit(1);
+    });
+}
